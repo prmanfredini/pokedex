@@ -5,31 +5,49 @@ MaterialColor colores(String tipo) {
     return Colors.green;
   }
   if (tipo == 'fire') {
-    return Colors.red;
+    return Colors.orange;
   }
-  if (tipo == 'grass') {
-    return Colors.green;
+  if (tipo == 'flying') {
+    return Colors.blueGrey;
   }
   if (tipo == 'water') {
     return Colors.blue;
   }
+  if (tipo == 'ice') {
+    return Colors.lightBlue;
+  }
   if (tipo == 'bug') {
-    return Colors.purple;
+    return Colors.lightGreen;
   }
   if (tipo == 'fighting') {
-    return Colors.indigo;
+    return Colors.red;
   }
   if (tipo == 'psychic') {
-    return Colors.orange;
+    return Colors.teal;
   }
   if (tipo == 'electric') {
     return Colors.yellow;
   }
   if (tipo == 'poison') {
-    return Colors.deepPurple;
+    return Colors.purple;
   }
   if (tipo == 'fairy') {
-    return Colors.teal;
+    return Colors.pink;
+  }
+  if (tipo == 'ghost') {
+    return Colors.cyan;
+  }
+  if (tipo == 'ground') {
+    return Colors.deepOrange;
+  }
+  if (tipo == 'dragon') {
+    return Colors.indigo;
+  }
+  if (tipo == 'dark') {
+    return Colors.deepPurple;
+  }
+   if (tipo == 'steel') {
+    return Colors.lime;
   }
   if (tipo == 'rock') {
     return Colors.brown;
