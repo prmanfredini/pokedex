@@ -4,7 +4,7 @@ v2.0
 projeto reformulado usando como base: https://www.figma.com/file/THLxZSlOoUYMZrjFg0Kl1M/Pok%C3%A9dex?node-id=218%3A4649
 
 done:
-novo layout, \n
+novo layout,
 busca por nome, 
 busca por geração, 
 ordenar exibição, 
