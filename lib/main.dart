@@ -11,6 +11,7 @@ class PokedexApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      locale: const Locale('en', ''),
       debugShowCheckedModeBanner: false,
       home: Pokedex(),
     );

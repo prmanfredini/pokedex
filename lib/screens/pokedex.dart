@@ -1,10 +1,16 @@
+
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:pokedex/components/colors.dart';
-import 'package:pokedex/components/mensagem_centro.dart';
-import 'package:pokedex/components/progress_bar.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:pokedex/bloc/poke_bloc.dart';
 import 'package:pokedex/models/pokemon.dart';
-import 'package:pokedex/services/dio_pokemon.dart';
+import 'package:pokedex/screens/sort_filter.dart';
+import 'package:pokedex/screens/stat_filter.dart';
+
+import '../components/progress_bar.dart';
+import '../widgets/cards.dart';
+import 'gen_filter.dart';
+
 
 class Pokedex extends StatefulWidget {
   @override
@@ -12,56 +18,31 @@ class Pokedex extends StatefulWidget {
 }
 
 class _PokedexState extends State<Pokedex> {
-  final List<PokeUrl> _suggestions = [];
-  bool loading = false;
-  final ScrollController _scrollController = ScrollController();
-
-  pokeFetch() async {
-    if (loading) {
-      return;
-    } else {
-      setState(() {
-        loading = true;
-      });
-      if (_suggestions.length <= 151) {
-        await getNext().then((value) {
-          if (value.isNotEmpty) {
-            _suggestions.addAll(value);
-          }
-        }).whenComplete(() {
-          loading = false;
-          return _suggestions;
-        });
-      }
-    }
-  }
-
-  Pokes() async {
-    await getPokeUrl().then((value) {
-      if (value.isNotEmpty) {
-        _suggestions.addAll(value);
-      }
-    }).whenComplete(() => _suggestions);
-  }
+  final TextEditingController busca = TextEditingController();
+  final PagingController<int, Pokemon> pagingController =
+      PagingController(firstPageKey: 0);
+  final PokeBloc pokeBloc = PokeBloc();
+  List<Pokemon> localPokeList = [];
+  List<Pokemon> filtroPokeList = [];
+  bool filtrar = false;
+  String selectSort = 'Smallest number first';
+  String selectGene = '';
+  String selectFilter = 'Smallest number first';
 
   @override
   void initState() {
     super.initState();
-    Pokes();
-    setState(() {});
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels >=
-              _scrollController.position.maxScrollExtent &&
-          !loading) {
-        pokeFetch();
-      }
+    pagingController.addPageRequestListener((pageKey) {
+      pokeBloc.getPokemon(pageKey, pagingController);
+    });
+    pokeBloc.streamPagingState.listen((event) {
+      pagingController.value = event;
     });
   }
 
   @override
   void dispose() {
     super.dispose();
-    _scrollController.dispose();
   }
 
   @override
@@ -69,106 +50,211 @@ class _PokedexState extends State<Pokedex> {
     return Scaffold(
       appBar: AppBar(
         title: Image.asset(
-          'lib/imagens/pokedex_logo.png',
-          scale: 2,
+          'assets/imagens/pokedex_logo.png',
+          scale: 3,
         ),
-        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: <Color>[Colors.red, Colors.blue]),
+          ),
+        ),
+        //centerTitle: true,
         backgroundColor: Colors.blueAccent,
-        toolbarHeight: 100,
-      ),
-      body: Padding(
-        padding:
-            const EdgeInsets.only(left: 24.0, right: 24, top: 2, bottom: 2),
-        child: Column(
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height -
-                  151,
-              child: GridView.builder(
-                shrinkWrap: true,
-                controller: _scrollController,
-                physics: const BouncingScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 250,
-                    crossAxisSpacing: 18,
-                    mainAxisSpacing: 18),
-                itemCount: _suggestions.length.clamp(0, 151),
-                itemBuilder: (context, index) {
-                  if (_suggestions.isNotEmpty) {
-                    final PokeUrl pokemon = _suggestions[index];
-                    return _cards(pokemon.url);
-                  }
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Image.asset(
-                          'lib/imagens/pokeball.png',
-                          scale: 2,
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.only(top: 24.0),
-                          child: Text(
-                            'Pokemon não encontrado',
-                            style: TextStyle(fontSize: 24),
+        toolbarHeight: 80,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 24, right: 24, bottom: 8),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.grey[300],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Material(
+                  color: Colors.grey[300],
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      IconButton(
+                        color: Colors.grey,
+                        icon: const Icon(Icons.search),
+                        onPressed: () {
+                          // realizar a busca
+                          print(busca.text);
+                        },
+                      ),
+                      Expanded(
+                        child: TextField(
+                          controller: busca,
+                          decoration: const InputDecoration.collapsed(
+                            hintText: 'What Pokémon are you looking for?',
                           ),
+                          onChanged: (valor)  {
+                            //final response =
+                            filtroPokeList = pokeBloc.busca(valor, localPokeList);
+                            filtroPokeList.isNotEmpty ? filtrar =  true : filtrar = false;
+                            setState(() {});
+                          },
                         ),
-                      ],
-                    ),
-                  );
-                },
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
-          ],
-
+          ),
+        ),
+        actions: [
+          Container(
+            alignment: Alignment.topRight,
+            padding: EdgeInsets.only(right: 8),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    print("Stat Filter");
+                    showModalBottomSheet(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25.0),
+                        ),
+                        context: context,
+                        builder: (builder) => StatFilter(
+                              functionButtom: (valor) {
+                                //criar função do filtro
+                                print(valor);
+                              },
+                              context: context,
+                            ));
+                  },
+                  constraints: BoxConstraints(minHeight: 10, minWidth: 10),
+                  icon: SvgPicture.asset(
+                    'assets/icons/generation.svg',
+                    height: 24,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    print("Sort Filter");
+                    showModalBottomSheet(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25.0),
+                        ),
+                        context: context,
+                        builder: (builder) => SortFilter(
+                          select: selectSort,
+                          functionButtom: (valor) {
+                            //criar função ordenação
+                            selectSort = valor;
+                            filtroPokeList = pokeBloc.sort(valor, localPokeList);
+                            filtroPokeList.isNotEmpty ? filtrar =  true : filtrar = false;
+                            setState(() {});
+                            print(valor);
+                          },
+                          context: context,
+                        ));
+                  },
+                  constraints: BoxConstraints(minHeight: 10, minWidth: 10),
+                  icon: SvgPicture.asset(
+                    'assets/icons/sort.svg',
+                    height: 24,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    print("Generation Filter");
+                   showModalBottomSheet(
+                       shape: RoundedRectangleBorder(
+                         borderRadius: BorderRadius.circular(25.0),
+                       ),
+                       context: context,
+                       builder: (builder) => GeneFilter(
+                         select: selectGene,
+                         functionButtom: (valor) async {
+                           valor != 'reset' ? filtrar =  true : filtrar = false;
+                           valor != 'reset' ? _loadingDialog(context) : null;
+                           final response = await pokeBloc.getGeneration(valor);
+                           filtroPokeList = response;
+                           selectGene = valor;
+                           filtroPokeList.sort((a, b) => a.id.compareTo(b.id));
+                           filtroPokeList.isNotEmpty? Navigator.pop(context) : null;
+                           setState(() {
+                           });
+                           print(valor);
+                         },
+                         context: context,
+                       ));
+                  },
+                  constraints: BoxConstraints(minHeight: 10, minWidth: 10),
+                  icon: SvgPicture.asset(
+                    'assets/icons/filter.svg',
+                    height: 24,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(4),
+          child: Column(
+            children: [
+              Visibility(
+                visible: !filtrar,
+                child: Expanded(
+                  child: PagedListView(
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    pagingController: pagingController,
+                    physics: const BouncingScrollPhysics(),
+                    builderDelegate: PagedChildBuilderDelegate<Pokemon>(
+                      itemBuilder: (context, item, index) {
+                        localPokeList.contains(item) ? null : localPokeList.add(item);
+                        return Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: cards(item, context),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+              Visibility(
+                visible: filtrar,
+                  child: Expanded(
+                    child: ListView.builder(
+                        itemCount: filtroPokeList.length,
+                        itemBuilder: (context, index){
+                      return Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: cards(filtroPokeList[index], context),
+                      );
+                    }),
+                  ))
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _cards(String url) {
-    return FutureBuilder<Pokemon>(
-        future: getCatch(url),
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-              break;
-            case ConnectionState.waiting:
-              return ProgressBar();
-            case ConnectionState.active:
-              break;
-            case ConnectionState.done:
-              if (snapshot.hasData && snapshot.data != null) {
-                final Pokemon pokemon = snapshot.data;
-                return Material(
-                  color: colores(pokemon.tipo1),
-                  borderRadius: BorderRadius.circular(25),
-                  child: InkWell(
-                    onTap: () => {},
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          pokemon.nome,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                        Image.network(pokemon.imagem, scale: 4),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Text(pokemon.tipo1),
-                            Text(pokemon.tipo2 ?? ''),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-          }
-          return CenteredMessage('Wild Pokemon');
-        });
+  void _loadingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: SizedBox(
+              height: 150,
+              width: 100,
+              child: ProgressBar()),
+        );
+      },
+    );
   }
 }

@@ -30,6 +30,11 @@ dependencies:
   flutter:
     sdk: flutter
   dio:
+  infinite_scroll_pagination:
+  flutter_svg:
+  flutter_localizations:
+    sdk: flutter
+  intl:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -59,8 +64,79 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - lib/imagens/pokedex_logo.png
-    - lib/imagens/pokeball.png
+    - assets/imagens/pokeball.png
+    - assets/imagens/pokedex_logo.png
+    # types
+    - assets/types/bug.svg
+    - assets/types/water.svg
+    - assets/types/poison.svg
+    - assets/types/psychic.svg
+    - assets/types/rock.svg
+    - assets/types/fairy.svg
+    - assets/types/steel.svg
+    - assets/types/ice.svg
+    - assets/types/dark.svg
+    - assets/types/flying.svg
+    - assets/types/electric.svg
+    - assets/types/ground.svg
+    - assets/types/dragon.svg
+    - assets/types/normal.svg
+    - assets/types/ghost.svg
+    - assets/types/fighting.svg
+    - assets/types/fire.svg
+    - assets/types/grass.svg
+    # patterns
+    - assets/patterns/pokeball.svg
+    - assets/patterns/6x3.svg
+    - assets/patterns/10x5.svg
+    - assets/patterns/circle.svg
+    # icons
+    - assets/icons/back.svg
+    - assets/icons/filter.svg
+    - assets/icons/generation.svg
+    - assets/icons/search.svg
+    - assets/icons/sort.svg
+    - assets/icons/front.svg
+    # heights
+    - assets/heights/medium.svg
+    - assets/heights/tall.svg
+    - assets/heights/short.svg
+    # weights
+    - assets/weights/heavy.svg
+    - assets/weights/light.svg
+    - assets/weights/normal.svg
+    # generations 1
+    - assets/generations/generation1/001.png
+    - assets/generations/generation1/007.png
+    - assets/generations/generation1/004.png
+    # generations 2
+    - assets/generations/generation2/152.png
+    - assets/generations/generation2/155.png
+    - assets/generations/generation2/158.png
+    # generations 3
+    - assets/generations/generation3/252.png
+    - assets/generations/generation3/255.png
+    - assets/generations/generation3/258.png
+    # generations 4
+    - assets/generations/generation4/387.png
+    - assets/generations/generation4/390.png
+    - assets/generations/generation4/393.png
+    # generations 5
+    - assets/generations/generation5/495.png
+    - assets/generations/generation5/498.png
+    - assets/generations/generation5/501.png
+    # generations 6
+    - assets/generations/generation6/650.png
+    - assets/generations/generation6/653.png
+    - assets/generations/generation6/656.png
+    # generations 7
+    - assets/generations/generation7/722.png
+    - assets/generations/generation7/725.png
+    - assets/generations/generation7/728.png
+    # generations 8
+    - assets/generations/generation8/810.png
+    - assets/generations/generation8/816.png
+    - assets/generations/generation8/813.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
@@ -74,10 +150,11 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
+  #    - family: Sf Pro
+  #      fonts:
+  #        - asset: assets/fonts/sf-pro-display-bold.ttf
+  #        - asset: assets/fonts/sf-pro-display-medium.ttf
+  #        - asset: assets/fonts/sf-pro-display-regular.ttf
   #         style: italic
   #   - family: Trajan Pro
   #     fonts:
