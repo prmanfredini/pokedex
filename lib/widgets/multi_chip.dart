@@ -1,51 +1,61 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:pokedex/models/types.dart';
+import 'package:pokedex/entities/types.dart';
 
 class MultiSelectChip extends StatefulWidget {
   final List<Types> reportList;
-  final Function(List<String>)? onSelectionChanged; // +added
-  MultiSelectChip(
-      this.reportList,
-      {this.onSelectionChanged} // +added
-      );
+  final Function(List<String>) onChanged;
+  final List<String> select;
+
+  const MultiSelectChip(this.reportList,
+      {Key? key, required this.onChanged, required this.select})
+      : super(key: key);
+
   @override
   _MultiSelectChipState createState() => _MultiSelectChipState();
 }
+
 class _MultiSelectChipState extends State<MultiSelectChip> {
-  // String selectedChoice = "";
-  List<String> selectedChoices = [];
+  late List<String> selectedChoices = widget.select;
   _buildChoiceList() {
     List<Widget> choices = [];
-    widget.reportList.forEach((item) {
+    for (var item in widget.reportList) {
       choices.add(Container(
-        padding: const EdgeInsets.all(7.0),
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: ChoiceChip(
-          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 5),
-          label: SvgPicture.asset(item.asset, color: selectedChoices.contains(item.asset) ? Colors.white : item.cor),
-          //labelPadding: EdgeInsets.all(10),
-          selected: selectedChoices.contains(item.asset),
+          tooltip: item.nome,
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 5),
+          label: SvgPicture.asset(item.asset,
+              color:
+                  selectedChoices.contains(item.nome) ? Colors.white : item.cor,
+              width: 16,
+              height: 16),
+          selected: selectedChoices.contains(item.nome),
           selectedColor: item.cor,
           backgroundColor: Colors.transparent,
           selectedShadowColor: item.cor,
-          elevation: selectedChoices.contains(item.asset) ? 5 : 0,
+          elevation: selectedChoices.contains(item.nome) ? 5 : 0,
           onSelected: (selected) {
             setState(() {
-              selectedChoices.contains(item.asset)
-                  ? selectedChoices.remove(item.asset)
-                  : selectedChoices.add(item.asset);
-              widget.onSelectionChanged != null ? (selectedChoices) :(null); // +added
+              selectedChoices.contains(item.nome)
+                  ? selectedChoices.remove(item.nome)
+                  : selectedChoices.add(item.nome);
+              widget.onChanged(selectedChoices);
             });
           },
         ),
       ));
-    });
+    }
     return choices;
   }
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: _buildChoiceList(),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: _buildChoiceList(),
+      ),
     );
   }
 }

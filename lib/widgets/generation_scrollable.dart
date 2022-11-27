@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import '../models/gene.dart';
+import '../entities/gene.dart';
 import 'generation_card.dart';
 import 'modal.dart';
 
 class GenerationScroll extends StatefulWidget {
   final List<Gene> generations;
   final Function function;
-  final Function(List<Gene>)? onSelectionChanged; // +a// dded
+  final Function(List<Gene>)? onSelectionChanged;
 
-  GenerationScroll(this.generations, this.function,
-      {this.onSelectionChanged} // +added
-      );
+  GenerationScroll(this.generations, this.function, {this.onSelectionChanged});
 
   @override
   _GenerationScrollState createState() => _GenerationScrollState();
@@ -19,7 +17,8 @@ class GenerationScroll extends StatefulWidget {
 class _GenerationScrollState extends State<GenerationScroll> {
   List<Gene> selectedChoice = [];
 
-  Widget _buildGenerations(BuildContext context, ScrollController scrollController) {
+  Widget _buildGenerations(
+      BuildContext context, ScrollController scrollController) {
     final safeAreaBottom = MediaQuery.of(context).padding.bottom;
 
     return Expanded(
@@ -54,4 +53,3 @@ class _GenerationScrollState extends State<GenerationScroll> {
     );
   }
 }
-

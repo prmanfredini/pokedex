@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
 
 class Modal extends StatelessWidget {
-  static const Radius _borderRadius = Radius.circular(30.0);
-
-  const Modal({
-    this.title,
-    required this.child,
-  });
-
-  final String? title;
+  final String title;
   final Widget child;
+  const Modal({required this.title, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -17,61 +11,20 @@ class Modal extends StatelessWidget {
       padding: EdgeInsets.only(top: 14),
       decoration: BoxDecoration(
         color: Colors.grey,
-        borderRadius: BorderRadius.only(
-          topLeft: _borderRadius,
-          topRight: _borderRadius,
-        ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(30.0)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          _DragLine(),
-          _Title(title),
+        children: [
+          Padding(
+            padding: EdgeInsets.only(top: 18, bottom: 8),
+            child: Text(
+              title,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+            ),
+          ),
           child,
         ],
-      ),
-    );
-  }
-}
-
-class _DragLine extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width * 0.2;
-
-    return Container(
-      width: width,
-      height: 3,
-      decoration: ShapeDecoration(
-        shape: StadiumBorder(),
-        color: Colors.grey[200],
-      ),
-    );
-  }
-}
-
-class _Title extends StatelessWidget {
-  const _Title(this.text);
-
-  final String? text;
-
-  @override
-  Widget build(BuildContext context) {
-    if (text == null) {
-      return SizedBox();
-    }
-
-    return Padding(
-      padding: EdgeInsets.only(
-        top: 18,
-        bottom: 8,
-      ),
-      child: Text(
-        text ?? '',
-        style: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w900,
-        ),
       ),
     );
   }

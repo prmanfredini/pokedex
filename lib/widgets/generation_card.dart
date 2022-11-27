@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-
-import '../models/gene.dart';
+import 'package:pokedex/entities/gene.dart';
 
 class GenerationCard extends StatelessWidget {
-  const GenerationCard(this.generation);
-
   final Gene generation;
+
+  const GenerationCard(this.generation);
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      //final height = constraints.maxHeight;
-
       return Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -26,7 +22,7 @@ class GenerationCard extends StatelessWidget {
           ],
         ),
         child: Stack(
-          children: <Widget>[
+          children: [
             Container(
               constraints: BoxConstraints.expand(),
               padding: EdgeInsets.all(16),
@@ -34,7 +30,7 @@ class GenerationCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
+                children: [
                   Text(
                     generation.gene,
                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -51,16 +47,6 @@ class GenerationCard extends StatelessWidget {
                 ],
               ),
             ),
-//            Positioned(
-//              bottom: -height * 0.136,
-//              right: -height * 0.03,
-//              child: SvgPicture.asset(
-//                  "assets/patterns/pokeball.svg",
-//                  color: Colors.white.withOpacity(0.4),
-//                width: height * 0.754,
-//                height: height * 0.754,
-//                ),
-//            ),
           ],
         ),
       );

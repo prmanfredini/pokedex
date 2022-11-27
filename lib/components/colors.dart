@@ -1,55 +1,55 @@
 import 'package:flutter/material.dart';
 
-MaterialColor colores(String tipo) {
-  if (tipo == 'grass') {
+MaterialColor getColor(String type) {
+  if (type == 'grass') {
     return Colors.green;
   }
-  if (tipo == 'fire') {
+  if (type == 'fire') {
     return Colors.orange;
   }
-  if (tipo == 'flying') {
+  if (type == 'flying') {
     return Colors.blueGrey;
   }
-  if (tipo == 'water') {
+  if (type == 'water') {
     return Colors.blue;
   }
-  if (tipo == 'ice') {
+  if (type == 'ice') {
     return Colors.lightBlue;
   }
-  if (tipo == 'bug') {
+  if (type == 'bug') {
     return Colors.lightGreen;
   }
-  if (tipo == 'fighting') {
+  if (type == 'fighting') {
     return Colors.red;
   }
-  if (tipo == 'psychic') {
+  if (type == 'psychic') {
     return Colors.teal;
   }
-  if (tipo == 'electric') {
+  if (type == 'electric') {
     return Colors.yellow;
   }
-  if (tipo == 'poison') {
+  if (type == 'poison') {
     return Colors.purple;
   }
-  if (tipo == 'fairy') {
+  if (type == 'fairy') {
     return Colors.pink;
   }
-  if (tipo == 'ghost') {
+  if (type == 'ghost') {
     return Colors.cyan;
   }
-  if (tipo == 'ground') {
+  if (type == 'ground') {
     return Colors.deepOrange;
   }
-  if (tipo == 'dragon') {
+  if (type == 'dragon') {
     return Colors.indigo;
   }
-  if (tipo == 'dark') {
+  if (type == 'dark') {
     return Colors.deepPurple;
   }
-   if (tipo == 'steel') {
+  if (type == 'steel') {
     return Colors.lime;
   }
-  if (tipo == 'rock') {
+  if (type == 'rock') {
     return Colors.brown;
   } else {
     return Colors.grey;
