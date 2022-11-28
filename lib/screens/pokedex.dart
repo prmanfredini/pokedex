@@ -30,6 +30,7 @@ class _PokedexState extends State<Pokedex> with TickerProviderStateMixin {
   List<String> weights = [];
   RangeValues range = const RangeValues(0, 905);
   late AnimationController spinController;
+  DateTime? currentBackPressTime;
 
   @override
   void initState() {
@@ -47,6 +48,107 @@ class _PokedexState extends State<Pokedex> with TickerProviderStateMixin {
     search.addListener(() => getSearch(search.text));
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: onWillPop,
+      child: Scaffold(
+        appBar: buildAppBar(
+            context,
+            search,
+            StatFilter(
+                types: types,
+                heights: heights,
+                weights: weights,
+                range: range,
+                funcTypes: (x) => setState(() => types = x),
+                funcHeights: (x) => setState(() => heights = x),
+                funcWeights: (x) => setState(() => weights = x),
+                funcRange: (x) => setState(() => range = x),
+                onSave: (x) => setFilter(clear: x)),
+            SortFilter(
+              select: selectSort,
+              functionButton: (value) async {
+                Navigator.pop(context);
+                setClear();
+                selectSort = value;
+                filterList = await pokeBloc.sort(value);
+                setState(() {});
+              },
+            ),
+            GeneFilter(
+              select: selectGene,
+              functionButton: (value) async {
+                Navigator.pop(context);
+                setClear();
+                filterList = await pokeBloc.getGeneration(value);
+                selectGene = value;
+                setState(() {});
+              },
+              context: context,
+            ),
+            () async => filterList = await pokeBloc
+                .searchByName(search.text)
+                .whenComplete(() => setState(() {}))),
+        body: RefreshIndicator(
+          displacement: 70,
+          onRefresh: () async {
+            await Future.delayed(const Duration(seconds: 1)).then((value) async {
+              if (mounted) {
+                reloadList(fav: favorites);
+              }
+            });
+          },
+          child: SafeArea(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                buildStream(
+                  PagedListView(
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    pagingController: pagingController,
+                    physics: const BouncingScrollPhysics(),
+                    builderDelegate: PagedChildBuilderDelegate<Pokemon>(
+                      itemBuilder: (context, item, index) {
+                        return Padding(
+                          padding:
+                              const EdgeInsets.only(top: 20, left: 16, right: 16),
+                          child: pokeCards(item, context, spinController),
+                        );
+                      },
+                    ),
+                  ),
+                  ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      itemCount: filterList.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding:
+                              const EdgeInsets.only(top: 20, left: 16, right: 16),
+                          child: pokeCards(
+                              filterList[index], context, spinController),
+                        );
+                      }),
+                  pokeBloc,
+                )
+              ],
+            ),
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+            onPressed: () async {
+              setClear();
+              favorites = !favorites;
+              reloadList(fav: favorites);
+            },
+            child: !favorites
+                ? const Icon(Icons.favorite_rounded)
+                : const Icon(Icons.home)),
+      ),
+    );
+  }
+
   void getSearch(String value) async {
     filterList = await pokeBloc.setFilter(
         types: types, heights: heights, weights: weights, range: range);
@@ -54,102 +156,21 @@ class _PokedexState extends State<Pokedex> with TickerProviderStateMixin {
     setState(() {});
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: buildAppBar(
-          context,
-          search,
-          StatFilter(
-              types: types,
-              heights: heights,
-              weights: weights,
-              range: range,
-              funcTypes: (x) => setState(() => types = x),
-              funcHeights: (x) => setState(() => heights = x),
-              funcWeights: (x) => setState(() => weights = x),
-              funcRange: (x) => setState(() => range = x),
-              onSave: (x) => setFilter(clear: x)),
-          SortFilter(
-            select: selectSort,
-            functionButton: (value) async {
-              Navigator.pop(context);
-              setClear();
-              selectSort = value;
-              filterList = await pokeBloc.sort(value);
-              setState(() {});
-            },
-          ),
-          GeneFilter(
-            select: selectGene,
-            functionButton: (value) async {
-              Navigator.pop(context);
-              setClear();
-              filterList = await pokeBloc.getGeneration(value);
-              selectGene = value;
-              setState(() {});
-            },
-            context: context,
-          ),
-          () async => filterList = await pokeBloc
-              .searchByName(search.text)
-              .whenComplete(() => setState(() {}))),
-      body: RefreshIndicator(
-        displacement: 70,
-        onRefresh: () async {
-          await Future.delayed(const Duration(seconds: 1)).then((value) async {
-            if (mounted) {
-              reloadList(fav: favorites);
-            }
-          });
-        },
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              buildStream(
-                PagedListView(
-                  keyboardDismissBehavior:
-                      ScrollViewKeyboardDismissBehavior.onDrag,
-                  pagingController: pagingController,
-                  physics: const BouncingScrollPhysics(),
-                  builderDelegate: PagedChildBuilderDelegate<Pokemon>(
-                    itemBuilder: (context, item, index) {
-                      return Padding(
-                        padding:
-                            const EdgeInsets.only(top: 20, left: 16, right: 16),
-                        child: pokeCards(item, context, spinController),
-                      );
-                    },
-                  ),
-                ),
-                ListView.builder(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    itemCount: filterList.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding:
-                            const EdgeInsets.only(top: 20, left: 16, right: 16),
-                        child: pokeCards(
-                            filterList[index], context, spinController),
-                      );
-                    }),
-                pokeBloc,
-              )
-            ],
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            setClear();
-            favorites = !favorites;
-            reloadList(fav: favorites);
-          },
-          child: !favorites
-              ? const Icon(Icons.favorite_rounded)
-              : const Icon(Icons.home)),
-    );
+  Future<bool> onWillPop() {
+    DateTime now = DateTime.now();
+    if (currentBackPressTime == null ||
+        now.difference(currentBackPressTime?? now) > const Duration(seconds: 2)) {
+      currentBackPressTime = now;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          behavior: SnackBarBehavior.floating,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20))),
+          content:
+          Text('Clique novamente para sair do app', textAlign: TextAlign.center,)));
+      return Future.value(false);
+    }
+    return Future.value(true);
   }
 
   void setClear() {
